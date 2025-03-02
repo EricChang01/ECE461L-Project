@@ -1,0 +1,160 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+      "/auth/login": {
+        "post": {
+          "responses": {
+            "401": {
+              "description": "Invalid credentials",
+              "schema": {
+                "$ref": "#/definitions/ErrorResponse"
+              }
+            },
+            "200": {
+              "description": "Login successful",
+              "schema": {
+                "$ref": "#/definitions/TokenResponse"
+              }
+            }
+          },
+          "summary": "Login user and return JWT token",
+          "operationId": "post_login",
+          "parameters": [
+            {
+              "name": "payload",
+              "required": true,
+              "in": "body",
+              "schema": {
+                "$ref": "#/definitions/Login"
+              }
+            }
+          ],
+          "tags": [
+            "auth"
+          ]
+        }
+      },
+      "/auth/register": {
+        "post": {
+          "responses": {
+            "400": {
+              "description": "User already exists",
+              "schema": {
+                "$ref": "#/definitions/ErrorResponse"
+              }
+            },
+            "201": {
+              "description": "User registered successfully"
+            }
+          },
+          "summary": "Register a new user",
+          "operationId": "post_register",
+          "parameters": [
+            {
+              "name": "payload",
+              "required": true,
+              "in": "body",
+              "schema": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          ],
+          "tags": [
+            "auth"
+          ]
+        }
+      }
+    },
+    "info": {
+      "title": "Authentication API",
+      "version": "1.0",
+      "description": "User Authentication API using JWT"
+    },
+    "produces": [
+      "application/json"
+    ],
+    "consumes": [
+      "application/json"
+    ],
+    "tags": [
+      {
+        "name": "auth",
+        "description": "User Authentication Endpoints"
+      }
+    ],
+    "definitions": {
+      "User": {
+        "required": [
+          "email",
+          "password",
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "minLength": 6
+          }
+        },
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          }
+        },
+        "type": "object"
+      },
+      "Login": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "minLength": 6
+          }
+        },
+        "type": "object"
+      },
+      "TokenResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Login status message"
+          },
+          "token": {
+            "type": "string",
+            "description": "JWT Access Token"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "responses": {
+      "ParseError": {
+        "description": "When a mask can't be parsed"
+      },
+      "MaskError": {
+        "description": "When any error occurs on mask"
+      }
+    }
+  }
+  
