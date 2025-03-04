@@ -1,10 +1,12 @@
 from flask import Flask, request
 from flask_restx import Api, Resource, fields
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, JWTManager
 import datetime
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "super-secret-key"  # Change this to a real secret in production!
+
 api = Api(
     app,
     title="Authentication API",
@@ -12,6 +14,7 @@ api = Api(
     description="User Authentication API using JWT",
 )
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 # Define a namespace for authentication-related routes
 auth_ns = api.namespace("auth", description="User Authentication Endpoints")
@@ -56,13 +59,15 @@ users_db = {}  # Temporary in-memory storage (replace with MongoDB later)
 # Define API Endpoints
 # ============================
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def home():
+    data = request.json
+    print(data)
     return "Flask API is running!", 200
 
 
 
-@auth_ns.route("/register")
+@auth_ns.route("/register", methods=['POST'])
 class Register(Resource):
     @api.expect(user_model)
     @api.response(201, "User registered successfully")
@@ -85,7 +90,7 @@ class Register(Resource):
         return {"message": "User registered successfully"}, 201
 
 
-@auth_ns.route("/login")
+@auth_ns.route("/login", methods=['POST'])
 class Login(Resource):
     @api.expect(login_model)
     @api.response(200, "Login successful", token_response)
@@ -103,6 +108,7 @@ class Login(Resource):
         access_token = create_access_token(
             identity=email, expires_delta=datetime.timedelta(hours=1)
         )
+        print("reach here")
         return {"message": "Login successful", "token": access_token}, 200
 
 
