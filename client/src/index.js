@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
-import LoginPage from './Login';
+import App from './App';  // Ensure you're importing App correctly
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <LoginPage />
+    <App />  {/* Replaces <LoginPage /> with <App /> */}
   </React.StrictMode>
 );
 
