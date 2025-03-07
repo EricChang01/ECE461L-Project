@@ -3,8 +3,15 @@ from flask_restx import Api, Resource, fields
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, JWTManager
 import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {
+    "origins": ["http://localhost:3000", "http://localhost:3001"],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization", "Accept"],
+    "supports_credentials": True
+}})
 app.config["JWT_SECRET_KEY"] = "super-secret-key"  # Change this to a real secret in production!
 
 api = Api(
@@ -113,7 +120,7 @@ class Login(Resource):
 
 
 # Add namespaces to API
-api.add_namespace(auth_ns, path="/api/auth")
+api.add_namespace(auth_ns, path="/auth")
 
 """
 if __name__ == "__main__":
