@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, JWTManager
 import datetime
 from flask_cors import CORS
+import db_utils
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
@@ -60,8 +61,6 @@ error_response = api.model(
     "ErrorResponse", {"message": fields.String(description="Error message")}
 )
 
-users_db = {}  # Temporary in-memory storage (replace with MongoDB later)
-
 # ============================
 # Define API Endpoints
 # ============================
@@ -84,15 +83,11 @@ class Register(Resource):
         data = request.json
         username, email, password = data["username"], data["email"], data["password"]
 
-        if email in users_db:
+        if db_utils.checkEmailExist(email):
             return {"message": "User already exists"}, 400
 
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-        users_db[email] = {
-            "username": username,
-            "email": email,
-            "password": hashed_password,
-        }
+        db_utils.addUser(username, email, hashed_password)
 
         return {"message": "User registered successfully"}, 201
 
@@ -107,8 +102,8 @@ class Login(Resource):
         data = request.json
         email, password = data["email"], data["password"]
 
-        if email not in users_db or not bcrypt.check_password_hash(
-            users_db[email]["password"], password
+        if not db_utils.checkEmailExist(email) or not bcrypt.check_password_hash(
+            db_utils.getUserHashedPassword(email), password
         ):
             return {"message": "Invalid credentials"}, 401
 
