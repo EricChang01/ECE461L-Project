@@ -1,4 +1,5 @@
 # End points for all database related operations
+from flask import jsonify
 users_db = {}  # Temporary in-memory storage (replace with MongoDB later)
 hardwares = {"hw1": 100, "hw2": 100}
 assigned = {}
@@ -12,6 +13,12 @@ def addUser(username, email, hashed_password):
         "email": email,
         "password": hashed_password,
     }
+
+def getAvailHardwares():
+    response_data = {}
+    for key, value in hardwares.items():
+        response_data[key] = value
+    return jsonify(response_data)
 
 def getUserHashedPassword(email):
     return users_db[email]["password"]

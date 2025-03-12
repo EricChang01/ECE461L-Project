@@ -130,11 +130,15 @@ class Login(Resource):
         )
         return {"message": "Login successful", "token": access_token}, 200
 
+@resources_ns.route("/", methods=['GET'])
+class Resources(Resource):
+    def get(self):
+        return db_utils.getAvailHardwares()
 
 @resources_ns.route("/checkout", methods=['POST'])
 class CheckOut(Resource):
     @api.expect(checkout_model)
-    @api.response(202, "Successfully checkout hardwares")
+    @api.response(202, "Successfully check out hardwares")
     @api.response(401, "Unauthorized")
     @api.response(503, "Service Unavailable")
     @jwt_required()
@@ -157,12 +161,12 @@ class CheckOut(Resource):
 @resources_ns.route("/checkin", methods=['POST'])
 class CheckIn(Resource):
     @api.expect(checkout_model)
-    @api.response(202, "Successfully checkin hardwares")
+    @api.response(202, "Successfully check in hardwares")
     @api.response(401, "Unauthorized")
     @api.response(503, "Service Unavailable")
     @jwt_required()
     def post(self):
-        """Check out hardware resources"""
+        """Check in hardware resources"""
         data = request.json
         hardware_set, amount = data["hardware_set"], data["amount"]
         # check for jwt token validity
@@ -181,7 +185,7 @@ class CheckIn(Resource):
 
 # Add namespaces to API
 api.add_namespace(auth_ns, path="/auth")
-api.add_namespace(resources_ns, path="/resource")
+api.add_namespace(resources_ns, path="/resources")
 
 """
 if __name__ == "__main__":
