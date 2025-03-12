@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_restx import Api, Resource, fields
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import create_access_token, JWTManager
+from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
 import datetime
 from flask_cors import CORS
 import db_utils
@@ -59,6 +59,15 @@ checkout_model = api.model(
     }
 )
 
+checkin_model = api.model(
+    "Checkin",
+    {
+        "token": fields.String(required=True, description="JWT Access Token"),
+        "hardware_set": fields.String(required=True, description="Targeted hardware set"),
+        "amount": fields.Integer(required=True, description="Amount to check in"),
+    }
+)
+
 token_response = api.model(
     "TokenResponse",
     {
@@ -80,7 +89,6 @@ def home():
     data = request.json
     print(data)
     return "Flask API is running!", 200
-
 
 
 @auth_ns.route("/register", methods=['POST'])
@@ -122,28 +130,54 @@ class Login(Resource):
         )
         return {"message": "Login successful", "token": access_token}, 200
 
+
 @resources_ns.route("/checkout", methods=['POST'])
 class CheckOut(Resource):
     @api.expect(checkout_model)
     @api.response(202, "Successfully checkout hardwares")
     @api.response(401, "Unauthorized")
     @api.response(503, "Service Unavailable")
+    @jwt_required()
     def post(self):
         """Check out hardware resources"""
         data = request.json
-        jwt_token = data["token"]
         hardware_set, amount = data["hardware_set"], data["amount"]
-        print(hardware_set, amount)
         # check for jwt token validity
-
+        email = get_jwt_identity()
         # check if hardware available
         if not db_utils.checkHardwareAvail(hardware_set, amount):
             return {"message": "Insufficient hardware resources"}, 503
         
-        if db_utils.checkoutHardwares(hardware_set, amount):
+        if db_utils.checkoutHardwares(email, hardware_set, amount):
             return {"message": f"Successfully check out {amount} from {hardware_set}"}, 202
         else:
-            return {"message": "Checkout failed"}, 503
+            return {"message": "Check out failed"}, 503
+
+
+@resources_ns.route("/checkin", methods=['POST'])
+class CheckIn(Resource):
+    @api.expect(checkout_model)
+    @api.response(202, "Successfully checkin hardwares")
+    @api.response(401, "Unauthorized")
+    @api.response(503, "Service Unavailable")
+    @jwt_required()
+    def post(self):
+        """Check out hardware resources"""
+        data = request.json
+        hardware_set, amount = data["hardware_set"], data["amount"]
+        # check for jwt token validity
+        email = get_jwt_identity()
+
+        # check if hardware available
+        if not db_utils.checkAssignedHardwares(email, hardware_set, amount):
+            return {"message": "No enough hardware to check in"}, 503
+
+        if db_utils.checkInHardwares(email, hardware_set, amount):
+            return {"message": f"Successfully check in {amount} of {hardware_set}"}, 202
+        else:
+            return {"message": "Check in failed"}, 503
+            
+
 
 # Add namespaces to API
 api.add_namespace(auth_ns, path="/auth")
