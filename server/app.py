@@ -26,6 +26,7 @@ jwt = JWTManager(app)
 
 # Define a namespace for authentication-related routes
 auth_ns = api.namespace("auth", description="User Authentication Endpoints")
+resources_ns = api.namespace("resources", description="Resource Management Endpoints")
 
 # Define User Registration and Login Models for Swagger
 user_model = api.model(
@@ -47,6 +48,15 @@ login_model = api.model(
             required=True, description="User password", min_length=6
         ),
     },
+)
+
+checkout_model = api.model(
+    "Checkout",
+    {
+        "token": fields.String(required=True, description="JWT Access Token"),
+        "hardware_set": fields.String(required=True, description="Targeted hardware set"),
+        "amount": fields.Integer(required=True, description="Amount to check out"),
+    }
 )
 
 token_response = api.model(
@@ -110,12 +120,34 @@ class Login(Resource):
         access_token = create_access_token(
             identity=email, expires_delta=datetime.timedelta(hours=1)
         )
-        print("reach here")
         return {"message": "Login successful", "token": access_token}, 200
 
+@resources_ns.route("/checkout", methods=['POST'])
+class CheckOut(Resource):
+    @api.expect(checkout_model)
+    @api.response(202, "Successfully checkout hardwares")
+    @api.response(401, "Unauthorized")
+    @api.response(503, "Service Unavailable")
+    def post(self):
+        """Check out hardware resources"""
+        data = request.json
+        jwt_token = data["token"]
+        hardware_set, amount = data["hardware_set"], data["amount"]
+        print(hardware_set, amount)
+        # check for jwt token validity
+
+        # check if hardware available
+        if not db_utils.checkHardwareAvail(hardware_set, amount):
+            return {"message": "Insufficient hardware resources"}, 503
+        
+        if db_utils.checkoutHardwares(hardware_set, amount):
+            return {"message": f"Successfully check out {amount} from {hardware_set}"}, 202
+        else:
+            return {"message": "Checkout failed"}, 503
 
 # Add namespaces to API
 api.add_namespace(auth_ns, path="/auth")
+api.add_namespace(resources_ns, path="/resource")
 
 """
 if __name__ == "__main__":
