@@ -4,7 +4,10 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
 import datetime
 from flask_cors import CORS
-import db_utils
+# import db_utils
+import sys
+sys.path.append('../')
+import database.db_access as db_utils
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
@@ -193,4 +196,5 @@ if __name__ == "__main__":
 """
 
 if __name__ == "__main__":
+    # db_utils.db_init()
     app.run(debug=True)

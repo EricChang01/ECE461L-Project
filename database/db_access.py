@@ -5,7 +5,7 @@ def db_init():
     uri = "mongodb+srv://ece461lab.rm3iy.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority&appName=ECE461Lab"
     client = MongoClient(uri,
                          tls=True,
-                         tlsCertificateKeyFile='X509-cert-4851382559130201289.pem')
+                         tlsCertificateKeyFile='../database/X509-cert-4851382559130201289.pem')
 
     global user_db 
     user_db = client['user_data']
@@ -131,3 +131,5 @@ def db_test():
 
 if __name__ == "__main__":
     db_test()
+
+db_init()
