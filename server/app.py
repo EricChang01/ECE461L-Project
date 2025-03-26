@@ -154,6 +154,7 @@ class Login(Resource):
 
 @resources_ns.route("/", methods=['GET'])
 class Resources(Resource):
+    """Get available hardware ressources"""
     def get(self):
         return db_access.getAvailHardwares(), 200
 
