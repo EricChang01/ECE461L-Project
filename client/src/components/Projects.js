@@ -11,6 +11,13 @@ const Projects = () => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const navigate = useNavigate();
 
+  // Add logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    navigate("/my-login");
+  };
+
   // Fetch user's projects on component mount
   useEffect(() => {
     const fetchProjects = async () => {
@@ -81,6 +88,13 @@ const Projects = () => {
 
   return (
     <div className="projects-container">
+      {/* Add logout button */}
+      <div className="logout-container">
+        <button className="logout-button" onClick={handleLogout}>
+          Log Out
+        </button>
+      </div>
+
       <div className="projects-header">
         <h1>Projects</h1>
         <div className="project-actions">
