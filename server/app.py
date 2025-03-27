@@ -6,7 +6,7 @@ import datetime
 from flask_cors import CORS
 import sys
 sys.path.append('../')
-import database.db_access as db_access
+from database import db_access
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
