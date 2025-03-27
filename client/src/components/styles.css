@@ -88,3 +88,257 @@ input:focus {
 .register-container {
   margin-top: 20px;
 }
+
+/* Projects page styling */
+.projects-container {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.projects-header h1 {
+  color: #4a90e2;
+  font-size: 28px;
+  margin: 0;
+}
+
+.project-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.action-button {
+  padding: 10px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-button {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.create-button:hover {
+  background-color: #3a7bc8;
+}
+
+.join-button {
+  background-color: #5cb85c;
+  color: white;
+}
+
+.join-button:hover {
+  background-color: #4cae4c;
+}
+
+.loading-container,
+.no-projects-container {
+  text-align: center;
+  padding: 50px 0;
+  color: #666;
+  font-size: 18px;
+}
+
+/* Table styling */
+.projects-table-container {
+  overflow-x: auto;
+}
+
+.projects-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.projects-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  text-align: left;
+  padding: 15px;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.projects-table td {
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: top;
+}
+
+.project-row:hover {
+  background-color: #f8f9fa;
+}
+
+.project-name {
+  font-weight: 600;
+  color: #4a90e2;
+}
+
+.project-id {
+  color: #6c757d;
+}
+
+.project-users {
+  color: #495057;
+}
+
+.project-description {
+  color: #495057;
+  max-width: 300px;
+}
+
+.hardware-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hardware-list li {
+  margin-bottom: 5px;
+  color: #495057;
+}
+
+/* Updated modal styling to center elements */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  /* Add a red border like in the image */
+  border: 2px solid #e74c3c;
+}
+
+.modal-content h2 {
+  color: #4a90e2;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center; /* Center the title */
+}
+
+.form-group {
+  margin-bottom: 20px;
+  /* Center the form group content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+  /* Align labels to the left side but with some max-width */
+  align-self: flex-start;
+  width: 100%;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center; /* Center the buttons */
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.modal-actions button {
+  padding: 10px 30px; /* Wider buttons */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.modal-actions button[type="button"] {
+  background-color: #6c757d;
+  color: white;
+}
+
+.modal-actions button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+.modal-actions button[type="submit"] {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.modal-actions button[type="submit"]:hover {
+  background-color: #3a7bc8;
+}
+
+.error-message {
+  color: #dc3545;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Add this new style to center align the Project ID column */
+.projects-table th:nth-child(2),
+.projects-table td:nth-child(2) {
+  text-align: center;
+}
+
+.center-align {
+  text-align: center;
+}
+
+.validating-message {
+  color: #6c757d;
+  font-style: italic;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Make the submit button disabled state more obvious */
+.modal-actions button[type="submit"]:disabled {
+  background-color: #b0c4de;
+  cursor: not-allowed;
+}

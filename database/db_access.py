@@ -100,10 +100,17 @@ def checkInHardwares(projectID, hardware_set, amount):
     checkout_col.delete_one({'amount': {'$lte': 0}})
     return 0
 
-def createProject(name, des, projectID):
+def createProject(name, des, projectID, creator_email):
     if proj_col.find_one({"_id": projectID}):
         return -1  # Non-unique ID
-    proj_col.insert_one({"_id": projectID, "name": name, "des": des, "users": []})
+    
+    # Store projectID as string
+    proj_col.insert_one({
+        "_id": projectID, 
+        "name": name, 
+        "des": des, 
+        "users": [creator_email]
+    })
     return 0
 
 def getProject(email, projectID):
@@ -118,6 +125,64 @@ def getProject(email, projectID):
     project["hwInUse"] = list(checkout_col.find({"project": projectID}, {"hw_name": 1, "amount": 1, "_id": 0}))
     return project
 
+def getUserProjects(email):
+    """Get all projects for a user"""
+    projects = proj_col.find({"users": email})
+    result = []
+    
+    for project in projects:
+        project_id = project["_id"]
+        
+        # Get username information for each user in the project
+        users_with_names = []
+        for user_email in project["users"]:
+            user_info = user_col.find_one({"email": user_email}, {"username": 1})
+            if user_info and "username" in user_info:
+                users_with_names.append({
+                    "email": user_email,
+                    "username": user_info["username"]
+                })
+            else:
+                users_with_names.append({
+                    "email": user_email,
+                    "username": user_email  # Fallback to email if username not found
+                })
+        
+        project_data = {
+            "projectID": project_id,
+            "name": project["name"],
+            "des": project["des"],
+            "users": users_with_names,
+            "hardware": list(checkout_col.find({"project": project_id}, {"hw_name": 1, "amount": 1, "_id": 0}))
+        }
+        result.append(project_data)
+    
+    return result
+
+def joinProject(email, projectID):
+    """Join an existing project"""
+    # Try to find the project with the exact ID
+    project = proj_col.find_one({"_id": projectID})
+    
+    # If not found and ID is a string of digits, try numeric version
+    if not project and isinstance(projectID, str) and projectID.isdigit():
+        project = proj_col.find_one({"_id": int(projectID)})
+    
+    # If not found and ID is a number, try string version
+    if not project and isinstance(projectID, int):
+        project = proj_col.find_one({"_id": str(projectID)})
+        
+    if not project:
+        return -1  # Project not found
+    
+    # Get the actual ID as stored in the database
+    actual_id = project["_id"]
+    
+    if email in project["users"]:
+        return 0  # User already in project
+    
+    proj_col.update_one({"_id": actual_id}, {"$push": {"users": email}})
+    return 0  # Success
 
 def db_test():
     # db_init()
@@ -167,7 +232,7 @@ def db_test():
     test_project_desc = "A test project"
 
     print("Testing project creation...")
-    assert createProject(test_project_name, test_project_desc, test_project_id) == 0, "Project creation failed"
+    assert createProject(test_project_name, test_project_desc, test_project_id, test_email) == 0, "Project creation failed"
 
     input("Project created. Check the database and press Enter to continue...")
 
@@ -226,6 +291,34 @@ def db_test():
 
     print("All tests passed successfully!")
 
+def getUserInfo(email):
+    """Get user information by email"""
+    user = user_col.find_one({"email": email}, {"username": 1, "email": 1, "_id": 0})
+    return user
+
+def checkProjectIDExists(project_id):
+    """Check if a project ID already exists
+    
+    Args:
+        project_id: The project ID to check
+        
+    Returns:
+        bool: True if the project ID exists, False otherwise
+    """
+    # Try both string and number versions of the ID
+    if isinstance(project_id, str) and project_id.isdigit():
+        # If it's a string of digits, also check the integer version
+        numeric_id = int(project_id)
+        return (proj_col.count_documents({"_id": project_id}) > 0 or 
+                proj_col.count_documents({"_id": numeric_id}) > 0)
+    elif isinstance(project_id, int):
+        # If it's an integer, also check the string version
+        string_id = str(project_id)
+        return (proj_col.count_documents({"_id": project_id}) > 0 or 
+                proj_col.count_documents({"_id": string_id}) > 0)
+    else:
+        # For non-numeric strings, just check as is
+        return proj_col.count_documents({"_id": project_id}) > 0
 
 db_init()
 

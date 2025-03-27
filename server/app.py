@@ -76,7 +76,7 @@ project_create_model = api.model(
     {
         "name": fields.String(required=True, description="Name of the group"),
         "des": fields.String(required=True, description="Description of the group"),
-        "projectID": fields.Integer(required=True, description="Unique ID of the group"),
+        "projectID": fields.String(required=True, description="Unique ID of the group"),
     }
 )
 
@@ -147,10 +147,18 @@ class Login(Resource):
         ):
             return {"message": "Invalid credentials"}, 401
 
+        # Get the username
+        user_info = db_access.getUserInfo(email)
+        username = user_info.get("username", "") if user_info else ""
+
         access_token = create_access_token(
             identity=email, expires_delta=datetime.timedelta(hours=1)
         )
-        return {"message": "Login successful", "token": access_token}, 200
+        return {
+            "message": "Login successful", 
+            "token": access_token,
+            "username": username
+        }, 200
 
 @resources_ns.route("/", methods=['GET'])
 class Resources(Resource):
@@ -206,6 +214,7 @@ class CheckIn(Resource):
 
 @project_ns.route("/create", methods=['POST'])            
 class CreateProject(Resource):
+    @jwt_required()
     @api.expect(project_create_model)
     @api.response(200, "Project successfully created")
     @api.response(400, "Non-unique project ID")
@@ -214,8 +223,14 @@ class CreateProject(Resource):
         """Create a new project"""
         data = request.json
         name, des, projectID = data["name"], data["des"], data["projectID"]
-
-        res = db_access.createProject(name, des, projectID)
+        
+        # Check if project ID already exists
+        if db_access.checkProjectIDExists(projectID):
+            return {"message": "Project ID already exists"}, 400
+            
+        email = get_jwt_identity()
+        
+        res = db_access.createProject(name, des, projectID, email)
         if res == -1:
             return {"message": "Non-unique project ID"}, 400
         elif res == 0:
@@ -240,7 +255,52 @@ class GetProject(Resource):
             return {"message": "Invalid operations"}, 400
         else:
             return res['users'], 200
+
+@project_ns.route("/user_projects", methods=['GET'])
+class UserProjects(Resource):
+    @jwt_required()
+    @api.response(200, "Projects retrieved successfully")
+    @api.response(400, "Unable to retrieve projects")
+    def get(self):
+        """Get all projects for the logged-in user"""
+        email = get_jwt_identity()
+        projects = db_access.getUserProjects(email)
         
+        return {"projects": projects}, 200
+
+@project_ns.route("/join", methods=['POST'])
+class JoinProject(Resource):
+    @jwt_required()
+    @api.expect(api.model("JoinProject", {
+        "projectID": fields.String(required=True, description="ID of the project to join")
+    }))
+    @api.response(200, "Successfully joined project")
+    @api.response(400, "Project not found")
+    def post(self):
+        """Join an existing project"""
+        data = request.json
+        projectID = data["projectID"]
+        email = get_jwt_identity()
+        
+        # Don't convert projectID here, let the joinProject function handle it
+        result = db_access.joinProject(email, projectID)
+        
+        if result == 0:
+            return {"message": "Successfully joined project"}, 200
+        else:
+            return {"message": "Project not found"}, 400
+
+@project_ns.route("/check_id_exists", methods=['GET'])
+class CheckProjectIDExists(Resource):
+    @jwt_required()
+    @api.response(200, "ID check completed")
+    def get(self):
+        """Check if a project ID already exists"""
+        project_id = request.args.get('id')
+        
+        # Don't convert to int here, let the db_access function handle it
+        exists = db_access.checkProjectIDExists(project_id)
+        return {"exists": exists}, 200
 
 # Add namespaces to API
 api.add_namespace(auth_ns, path="/auth")

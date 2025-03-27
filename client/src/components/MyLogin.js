@@ -26,6 +26,13 @@ const MyLogin = () => {
         setMessage(`✅ Success: ${data.message}`);
         if (data.token) {
           localStorage.setItem("token", data.token);
+
+          // Store the username for later use
+          if (data.username) {
+            localStorage.setItem("username", data.username);
+          }
+
+          navigate("/projects");
         }
       } else if (response.status === 401) {
         setMessage(`❌ Error: ${data.message}`);
