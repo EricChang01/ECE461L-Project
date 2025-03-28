@@ -1,5 +1,29 @@
 from pymongo import MongoClient
 
+def initialize_hardware_sets():
+    """Initialize or update the two hardware sets with capacity of 100 each"""
+    # Define the two hardware sets
+    hw_sets = [
+        {"name": "HWSet1", "capacity": 100, "avail": 100},
+        {"name": "HWSet2", "capacity": 100, "avail": 100}
+    ]
+    
+    # Check if hardware sets already exist
+    existing_count = hws_col.count_documents({})
+    if existing_count >= 2:
+        print("Hardware sets already initialized")
+        return
+    
+    # Upsert each hardware set (update if exists, insert if not)
+    for hw_set in hw_sets:
+        hws_col.update_one(
+            {"name": hw_set["name"]},
+            {"$set": hw_set},
+            upsert=True
+        )
+    
+    print("Hardware sets initialized successfully")
+
 def db_init():
     uri = "mongodb+srv://ece461lab.rm3iy.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority&appName=ECE461Lab"
     client = MongoClient(uri,
@@ -13,8 +37,9 @@ def db_init():
     proj_col = project_db['Projects']
     hws_col = project_db['HwSets']
     checkout_col = project_db['HwInUse']
-
-
+    
+    # Initialize hardware sets
+    initialize_hardware_sets()
 
 def checkEmailExist(email):
     # result = user_col.find({'email': email})
@@ -439,6 +464,11 @@ def releaseAllProjectHardware(projectID):
     except Exception as e:
         print(f"Error releasing project hardware: {e}")
         return -1
+
+def getAllHardwareInfo():
+    """Get complete hardware information including availability and capacity"""
+    all_hw = hws_col.find({}, {"name": 1, "avail": 1, "capacity": 1, "_id": 0})
+    return list(all_hw)
 
 db_init()
 

@@ -162,9 +162,15 @@ class Login(Resource):
 
 @resources_ns.route("/", methods=['GET'])
 class Resources(Resource):
-    """Get available hardware ressources"""
+    """Get available hardware resources"""
     def get(self):
-        return db_access.getAvailHardwares(), 200
+        # Use the function to get hardware info including capacity
+        hardware_sets = db_access.getAllHardwareInfo()
+        
+        # For debugging, print what's being returned
+        print("Hardware sets:", hardware_sets)
+        
+        return hardware_sets, 200
 
 @resources_ns.route("/checkout", methods=['POST'])
 class CheckOut(Resource):
