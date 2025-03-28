@@ -440,6 +440,10 @@ def releaseAllProjectHardware(projectID):
         print(f"Error releasing project hardware: {e}")
         return -1
 
+def getCheckedOutHW(projectID):
+    all_hw = checkout_col.find({"project": projectID}, {"_id":0, "project":0})
+    return [hw for hw in all_hw]
+
 db_init()
 
 if __name__ == "__main__":
