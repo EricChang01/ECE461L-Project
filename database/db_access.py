@@ -320,6 +320,126 @@ def checkProjectIDExists(project_id):
         # For non-numeric strings, just check as is
         return proj_col.count_documents({"_id": project_id}) > 0
 
+def getProjectDirectly(projectID):
+    """
+    Get a project by ID without adding the user to it
+    
+    Args:
+        projectID (str/int): ID of the project
+        
+    Returns:
+        dict: Project document or None if not found
+    """
+    # Try to find the project with the exact ID
+    project = proj_col.find_one({"_id": projectID})
+    
+    # If not found and ID is a string of digits, try numeric version
+    if not project and isinstance(projectID, str) and projectID.isdigit():
+        project = proj_col.find_one({"_id": int(projectID)})
+    
+    # If not found and ID is a number, try string version
+    if not project and isinstance(projectID, int):
+        project = proj_col.find_one({"_id": str(projectID)})
+        
+    return project
+
+def removeUserFromProject(email, projectID):
+    """
+    Remove a user from a project
+    
+    Args:
+        email (str): Email of the user
+        projectID (str/int): ID of the project
+        
+    Returns:
+        int: 0 if successful, non-zero otherwise
+    """
+    try:
+        # Find the project
+        project = getProjectDirectly(projectID)
+        if not project:
+            return -1  # Project not found
+        
+        # Get the actual ID as stored in the database
+        actual_id = project["_id"]
+        
+        # Remove the user from the project
+        result = proj_col.update_one(
+            {"_id": actual_id},
+            {"$pull": {"users": email}}
+        )
+        
+        if result.modified_count != 1:
+            return -1  # User not found in project or update failed
+        
+        return 0  # Success
+    except Exception as e:
+        print(f"Error removing user from project: {e}")
+        return -1
+
+def deleteProject(projectID):
+    """
+    Delete a project completely
+    
+    Args:
+        projectID (str/int): ID of the project
+        
+    Returns:
+        int: 0 if successful, non-zero otherwise
+    """
+    try:
+        # Find the project to get the actual ID
+        project = getProjectDirectly(projectID)
+        if not project:
+            return -1  # Project not found
+        
+        # Get the actual ID as stored in the database
+        actual_id = project["_id"]
+        
+        # Delete the project
+        result = proj_col.delete_one({"_id": actual_id})
+        
+        if result.deleted_count != 1:
+            return -1  # Project not found or delete failed
+        
+        return 0  # Success
+    except Exception as e:
+        print(f"Error deleting project: {e}")
+        return -1
+
+def releaseAllProjectHardware(projectID):
+    """
+    Release all hardware resources associated with a project
+    
+    Args:
+        projectID (str/int): ID of the project
+        
+    Returns:
+        int: 0 if successful, non-zero otherwise
+    """
+    try:
+        # Find all hardware assigned to this project
+        hardware_items = checkout_col.find({"project": projectID})
+        
+        # For each hardware item, return it to the available pool
+        for item in hardware_items:
+            hw_name = item["hw_name"]
+            amount = item["amount"]
+            
+            # Increase the available count for this hardware
+            hws_col.update_one(
+                {"name": hw_name},
+                {"$inc": {"avail": amount}}
+            )
+        
+        # Delete all checkout records for this project
+        checkout_col.delete_many({"project": projectID})
+        
+        return 0  # Success
+    except Exception as e:
+        print(f"Error releasing project hardware: {e}")
+        return -1
+
 db_init()
 
 if __name__ == "__main__":

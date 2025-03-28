@@ -302,6 +302,59 @@ class CheckProjectIDExists(Resource):
         exists = db_access.checkProjectIDExists(project_id)
         return {"exists": exists}, 200
 
+@project_ns.route("/leave", methods=['POST'])
+class LeaveProject(Resource):
+    @jwt_required()
+    @api.expect(api.model("LeaveProject", {
+        "projectID": fields.String(required=True, description="ID of the project to leave")
+    }))
+    @api.response(200, "Successfully left project")
+    @api.response(404, "Project not found")
+    @api.response(403, "User is not a member of this project")
+    @api.response(500, "Server error")
+    def post(self):
+        """Leave a project (will delete project if last user)"""
+        data = request.json
+        projectID = data["projectID"]
+        email = get_jwt_identity()
+        
+        # First check if the project exists
+        if not db_access.checkProjectIDExists(projectID):
+            return {"message": "Project not found"}, 404
+            
+        # Get the project to check if user is a member
+        project = db_access.getProjectDirectly(projectID)
+        if not project:
+            return {"message": "Project not found"}, 404
+            
+        # Check if user is a member
+        if email not in project.get('users', []):
+            return {"message": "You are not a member of this project"}, 403
+            
+        # Count number of users in the project
+        user_count = len(project.get('users', []))
+        
+        # If last user, delete the project
+        if user_count <= 1:
+            # Release all hardware resources associated with this project
+            result = db_access.releaseAllProjectHardware(projectID)
+            if result != 0:
+                return {"message": "Error releasing hardware resources"}, 500
+                
+            # Delete the project
+            result = db_access.deleteProject(projectID)
+            if result != 0:
+                return {"message": "Error deleting project"}, 500
+                
+            return {"message": "You were the last member. Project has been deleted."}, 200
+        else:
+            # Not the last user, just remove this user from the project
+            result = db_access.removeUserFromProject(email, projectID)
+            if result != 0:
+                return {"message": "Error removing user from project"}, 500
+                
+            return {"message": "Successfully left the project"}, 200
+
 # Add namespaces to API
 api.add_namespace(auth_ns, path="/auth")
 api.add_namespace(resources_ns, path="/resources")
