@@ -10,7 +10,7 @@ const MyLogin = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", email, password); // Debug log
+    // console.log("Logging in with:", email, password); // Debug log
 
     try {
       const response = await fetch("http://127.0.0.1:5000/auth/login", {

@@ -1,0 +1,767 @@
+{
+  "analysis_date": "2025-03-28T14:42:13.870924",
+  "databases": [
+    {
+      "name": "Projects",
+      "collections": [
+        {
+          "name": "Project1",
+          "document_count": 1,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "Name": "str",
+            "ID": "str",
+            "Description": "str"
+          },
+          "distributions": {
+            "Name": [
+              {
+                "_id": "P1",
+                "count": 1
+              }
+            ],
+            "ID": [
+              {
+                "_id": "as1234",
+                "count": 1
+              }
+            ],
+            "Description": [
+              {
+                "_id": "This is the first project",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 8.869171142578125e-05
+        }
+      ]
+    },
+    {
+      "name": "hw_stats",
+      "collections": [
+        {
+          "name": "checked_out",
+          "document_count": 2,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "email": "str",
+            "hw_name": "str",
+            "amount": "int"
+          },
+          "distributions": {
+            "email": [
+              {
+                "_id": "eric@g.com",
+                "count": 1
+              },
+              {
+                "_id": "eric@example.com",
+                "count": 1
+              }
+            ],
+            "hw_name": [
+              {
+                "_id": "hw1",
+                "count": 2
+              }
+            ],
+            "amount": [
+              {
+                "_id": 50,
+                "count": 1
+              },
+              {
+                "_id": 10,
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.00014495849609375
+        },
+        {
+          "name": "hws",
+          "document_count": 2,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "name": "str",
+            "capacity": "int",
+            "avail": "int"
+          },
+          "distributions": {
+            "name": [
+              {
+                "_id": "hw2",
+                "count": 1
+              },
+              {
+                "_id": "hw1",
+                "count": 1
+              }
+            ],
+            "capacity": [
+              {
+                "_id": 100,
+                "count": 2
+              }
+            ],
+            "avail": [
+              {
+                "_id": 100,
+                "count": 1
+              },
+              {
+                "_id": 40,
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.0001163482666015625
+        }
+      ]
+    },
+    {
+      "name": "project_db",
+      "collections": [
+        {
+          "name": "Users",
+          "document_count": 6,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "username": "str",
+            "email": "str",
+            "pwd": "str"
+          },
+          "distributions": {
+            "username": [
+              {
+                "_id": "testuser",
+                "count": 1
+              },
+              {
+                "_id": "jack",
+                "count": 1
+              },
+              {
+                "_id": "jaden",
+                "count": 1
+              }
+            ],
+            "email": [
+              {
+                "_id": "john@utexas.edu",
+                "count": 1
+              },
+              {
+                "_id": "testuser@example.com",
+                "count": 1
+              },
+              {
+                "_id": "eric@g.com",
+                "count": 1
+              }
+            ],
+            "pwd": [
+              {
+                "_id": "$2b$12$wXUqd2szNkrmaR03OyCgceVxSHpZh8UutGMBP/ZFjNGLsM2KoUyl6",
+                "count": 1
+              },
+              {
+                "_id": "$2b$12$ia1DUulnqj5MNRcd/YGrSu.wPWrpF4u6.sRdAf3WJGvEfMuFxta46",
+                "count": 1
+              },
+              {
+                "_id": "$2b$12$wdgsTktg.Zcp0nOqH4ORyeM3oy2mAT.6g/NBlqmaJRfy0..MiGn7i",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.0007467269897460938
+        },
+        {
+          "name": "HwSets",
+          "document_count": 3,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "name": "str",
+            "capacity": "int",
+            "avail": "int"
+          },
+          "distributions": {
+            "name": [
+              {
+                "_id": "Test Hardware",
+                "count": 1
+              },
+              {
+                "_id": "HWSet1",
+                "count": 1
+              },
+              {
+                "_id": "HWSet2",
+                "count": 1
+              }
+            ],
+            "capacity": [
+              {
+                "_id": 100,
+                "count": 2
+              },
+              {
+                "_id": 10,
+                "count": 1
+              }
+            ],
+            "avail": [
+              {
+                "_id": 100,
+                "count": 2
+              },
+              {
+                "_id": 5,
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.00018978118896484375
+        },
+        {
+          "name": "Projects",
+          "document_count": 6,
+          "sample_structure": {
+            "_id": "int",
+            "name": "str",
+            "des": "str",
+            "users": "list"
+          },
+          "distributions": {
+            "name": [
+              {
+                "_id": "Test Project",
+                "count": 1
+              },
+              {
+                "_id": "Project 001",
+                "count": 1
+              },
+              {
+                "_id": "Project 1",
+                "count": 1
+              }
+            ],
+            "des": [
+              {
+                "_id": "A test project",
+                "count": 1
+              },
+              {
+                "_id": "2nd project",
+                "count": 1
+              },
+              {
+                "_id": "1st project",
+                "count": 1
+              }
+            ],
+            "users": [
+              {
+                "_id": "['john@utexas.edu']",
+                "count": 2
+              },
+              {
+                "_id": "['john@utexas.edu', 'zxx@gmail.com', 'jaden@gmail.com']",
+                "count": 1
+              },
+              {
+                "_id": "['zxx@gmail.com', 'john@utexas.edu']",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.0006227493286132812
+        },
+        {
+          "name": "HwInUse",
+          "document_count": 1,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "project": "int",
+            "hw_name": "str",
+            "amount": "int"
+          },
+          "distributions": {
+            "project": [
+              {
+                "_id": 1001,
+                "count": 1
+              }
+            ],
+            "hw_name": [
+              {
+                "_id": "Test Hardware",
+                "count": 1
+              }
+            ],
+            "amount": [
+              {
+                "_id": 5,
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 7.05718994140625e-05
+        }
+      ]
+    },
+    {
+      "name": "sample_mflix",
+      "collections": [
+        {
+          "name": "embedded_movies",
+          "document_count": 3483,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "plot": "str",
+            "genres": "list",
+            "runtime": "int",
+            "cast": "list",
+            "num_mflix_comments": "int",
+            "poster": "str",
+            "title": "str",
+            "fullplot": "str",
+            "languages": "list",
+            "released": "datetime",
+            "directors": "list",
+            "writers": "list",
+            "awards": "dict",
+            "lastupdated": "str",
+            "year": "int",
+            "imdb": "dict",
+            "countries": "list",
+            "type": "str",
+            "tomatoes": "dict",
+            "plot_embedding": "list"
+          },
+          "distributions": {
+            "plot": [
+              {
+                "_id": null,
+                "count": 80
+              },
+              {
+                "_id": "The life of an immigrant family from Sweden in the Minnesota's forests, during mid 19th century",
+                "count": 5
+              },
+              {
+                "_id": "Jackie Chan is the undefeated Kung Fu Master who dishes out the action in traditional Jackie Chan style. When a young boy sets out to learn how to fight from the Master himself, he not only...",
+                "count": 3
+              }
+            ],
+            "genres": [
+              {
+                "_id": "['Action', 'Crime', 'Drama']",
+                "count": 256
+              },
+              {
+                "_id": "['Action', 'Comedy', 'Crime']",
+                "count": 143
+              },
+              {
+                "_id": "['Action', 'Adventure', 'Comedy']",
+                "count": 139
+              }
+            ],
+            "runtime": [
+              {
+                "_id": 90,
+                "count": 116
+              },
+              {
+                "_id": 100,
+                "count": 108
+              },
+              {
+                "_id": 95,
+                "count": 105
+              }
+            ],
+            "cast": [
+              {
+                "_id": null,
+                "count": 18
+              },
+              {
+                "_id": "['Max von Sydow', 'Liv Ullmann', 'Eddie Axberg', 'Pierre Lindstedt']",
+                "count": 5
+              },
+              {
+                "_id": "['William Shatner', 'Leonard Nimoy', 'DeForest Kelley', 'James Doohan']",
+                "count": 4
+              }
+            ]
+          },
+          "size_mb": 71.89634037017822
+        },
+        {
+          "name": "sessions",
+          "document_count": 1,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "user_id": "str",
+            "jwt": "str"
+          },
+          "distributions": {
+            "user_id": [
+              {
+                "_id": "t3qulfeem@kwiv5.6ur",
+                "count": 1
+              }
+            ],
+            "jwt": [
+              {
+                "_id": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MTk5MDkzMjEsIm5iZiI6MTUxOTkwOTMyMSwianRpIjoiNmJlZDAwMWYtNTFiYi00NzVhLTgxZDAtMDcwNGE5Mjk0MWZlIiwiZXhwIjoxNTE5OTEwMjIxLCJpZGVudGl0eSI6eyJlbWFpbCI6InQzcXVsZmVlbUBrd2l2NS42dXIiLCJuYW1lIjoiM2lveHJtZnF4IiwicGFzc3dvcmQiOm51bGx9LCJmcmVzaCI6ZmFsc2UsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2NsYWltcyI6eyJ1c2VyIjp7ImVtYWlsIjoidDNxdWxmZWVtQGt3aXY1LjZ1ciIsIm5hbWUiOiIzaW94cm1mcXgiLCJwYXNzd29yZCI6bnVsbH19fQ.ejtr_NyZyBronWMKuE0RFTjWej--T0zGrdc_iymGtVs",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.000514984130859375
+        },
+        {
+          "name": "users",
+          "document_count": 185,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "name": "str",
+            "email": "str",
+            "password": "str"
+          },
+          "distributions": {
+            "name": [
+              {
+                "_id": "Qyburn",
+                "count": 1
+              },
+              {
+                "_id": "Heather Leonard",
+                "count": 1
+              },
+              {
+                "_id": "Lisa Silva",
+                "count": 1
+              }
+            ],
+            "email": [
+              {
+                "_id": "rory_mccann@gameofthron.es",
+                "count": 1
+              },
+              {
+                "_id": "thomas_buckley@fakegmail.com",
+                "count": 1
+              },
+              {
+                "_id": "heather_leonard@fakegmail.com",
+                "count": 1
+              }
+            ],
+            "password": [
+              {
+                "_id": "$2b$12$yGqxLG9LZpXA2xVDhuPnSOZd.VURVkz7wgOLY3pnO0s7u2S1ZO32y",
+                "count": 1
+              },
+              {
+                "_id": "$2b$12$vQQlmv3ubYNZh8HfSXmu4.peazChIJo15UEnLpQz9O90nr8U/qlfS",
+                "count": 1
+              },
+              {
+                "_id": "$2b$12$ULJ9tL7jh8yPXNDmCJi4C.mzkxzLfIQXakq3td9dJQs3io/Zg/AE2",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.0281982421875
+        },
+        {
+          "name": "movies",
+          "document_count": 21349,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "plot": "str",
+            "genres": "list",
+            "runtime": "int",
+            "cast": "list",
+            "poster": "str",
+            "title": "str",
+            "fullplot": "str",
+            "languages": "list",
+            "released": "datetime",
+            "directors": "list",
+            "rated": "str",
+            "awards": "dict",
+            "lastupdated": "str",
+            "year": "int",
+            "imdb": "dict",
+            "countries": "list",
+            "type": "str",
+            "tomatoes": "dict",
+            "num_mflix_comments": "int"
+          },
+          "distributions": {
+            "plot": [
+              {
+                "_id": null,
+                "count": 1146
+              },
+              {
+                "_id": "In the middle of the 19th century, Kristina and Karl-Oskar live in a small rural village in Smaaland (southern Sweden). They get married and try to make a living on a small spot of land. ...",
+                "count": 5
+              },
+              {
+                "_id": "The life of an immigrant family from Sweden in the Minnesota's forests, during mid 19th century",
+                "count": 5
+              }
+            ],
+            "genres": [
+              {
+                "_id": "['Drama']",
+                "count": 3208
+              },
+              {
+                "_id": "['Comedy']",
+                "count": 1103
+              },
+              {
+                "_id": "['Comedy', 'Drama']",
+                "count": 1025
+              }
+            ],
+            "runtime": [
+              {
+                "_id": 90,
+                "count": 979
+              },
+              {
+                "_id": 100,
+                "count": 719
+              },
+              {
+                "_id": 95,
+                "count": 687
+              }
+            ],
+            "cast": [
+              {
+                "_id": null,
+                "count": 362
+              },
+              {
+                "_id": "['William Shatner', 'Leonard Nimoy', 'DeForest Kelley', 'James Doohan']",
+                "count": 6
+              },
+              {
+                "_id": "['Cenk Uygur', 'George W. Bush', 'Connie Chung', 'Wesley Clark']",
+                "count": 5
+              }
+            ]
+          },
+          "size_mb": 32.53844451904297
+        },
+        {
+          "name": "comments",
+          "document_count": 41079,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "name": "str",
+            "email": "str",
+            "movie_id": "ObjectId",
+            "text": "str",
+            "date": "datetime"
+          },
+          "distributions": {
+            "name": [
+              {
+                "_id": "Mace Tyrell",
+                "count": 277
+              },
+              {
+                "_id": "Rodrik Cassel",
+                "count": 260
+              },
+              {
+                "_id": "The High Sparrow",
+                "count": 260
+              }
+            ],
+            "email": [
+              {
+                "_id": "roger_ashton-griffiths@gameofthron.es",
+                "count": 277
+              },
+              {
+                "_id": "jonathan_pryce@gameofthron.es",
+                "count": 260
+              },
+              {
+                "_id": "ron_donachie@gameofthron.es",
+                "count": 260
+              }
+            ],
+            "movie_id": [
+              {
+                "_id": "573a13bff29313caabd5e91e",
+                "count": 161
+              },
+              {
+                "_id": "573a13a5f29313caabd159a9",
+                "count": 158
+              },
+              {
+                "_id": "573a13abf29313caabd25582",
+                "count": 158
+              }
+            ],
+            "text": [
+              {
+                "_id": "Corporis exercitationem aperiam magni et. Quaerat dolorum quos ipsa quia. Blanditiis esse consequatur quasi.",
+                "count": 1
+              },
+              {
+                "_id": "Quia ut vel cupiditate sed tempore deserunt exercitationem cum. Voluptatem labore esse aspernatur iusto sit facere fugiat. Sapiente possimus dolor adipisci laborum ullam labore minima.",
+                "count": 1
+              },
+              {
+                "_id": "Error exercitationem aliquid rem dolorem voluptatum. Rem id iure asperiores officia sed ad quo. Natus iure ipsum nam veniam perferendis veritatis culpa.",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 11.144916534423828
+        },
+        {
+          "name": "theaters",
+          "document_count": 1564,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "theaterId": "int",
+            "location": "dict"
+          },
+          "distributions": {
+            "theaterId": [
+              {
+                "_id": 2541,
+                "count": 1
+              },
+              {
+                "_id": 1457,
+                "count": 1
+              },
+              {
+                "_id": 125,
+                "count": 1
+              }
+            ],
+            "location": [
+              {
+                "_id": "{'address': {'street1': '5757 Wayne Newton Blvd', 'street2': None, 'city': 'Las Vegas', 'state': 'NV', 'zipcode': '89119'}, 'geo': {'type': 'Point', 'coordinates': [-115.150408, 36.08863]}}",
+                "count": 15
+              },
+              {
+                "_id": "{'address': {'street1': '1 World Way', 'street2': None, 'city': 'Los Angeles', 'state': 'CA', 'zipcode': '90045'}, 'geo': {'type': 'Point', 'coordinates': [-118.398227, 33.94466]}}",
+                "count": 10
+              },
+              {
+                "_id": "{'address': {'street1': '3200 East Airfield Drive', 'street2': None, 'city': 'Dallas', 'state': 'TX', 'zipcode': '75261'}, 'geo': {'type': 'Point', 'coordinates': [-97.040653, 32.897449]}}",
+                "count": 8
+              }
+            ]
+          },
+          "size_mb": 0.33362483978271484
+        }
+      ]
+    },
+    {
+      "name": "user_data",
+      "collections": [
+        {
+          "name": "users",
+          "document_count": 4,
+          "sample_structure": {
+            "_id": "ObjectId",
+            "username": "str",
+            "email": "str",
+            "password": "str"
+          },
+          "distributions": {
+            "username": [
+              {
+                "_id": "eric_c",
+                "count": 1
+              },
+              {
+                "_id": "eric",
+                "count": 1
+              },
+              {
+                "_id": "foobar",
+                "count": 1
+              }
+            ],
+            "email": [
+              {
+                "_id": "eric@example.com",
+                "count": 1
+              },
+              {
+                "_id": "fbar@gmail.com",
+                "count": 1
+              },
+              {
+                "_id": "eric@g.com",
+                "count": 1
+              }
+            ],
+            "password": [
+              {
+                "_id": "hash2",
+                "count": 1
+              },
+              {
+                "_id": "hash",
+                "count": 1
+              },
+              {
+                "_id": "$2b$12$dgddUSbSQpB4RIgBMWON8eP2O.pE6ezg0Z/Le3MPTbBrosm0Eux6a",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 0.00044155120849609375
+        },
+        {
+          "name": "projects",
+          "document_count": 1,
+          "sample_structure": {
+            "_id": "int",
+            "name": "str",
+            "des": "str"
+          },
+          "distributions": {
+            "name": [
+              {
+                "_id": "test1",
+                "count": 1
+              }
+            ],
+            "des": [
+              {
+                "_id": "test project for db",
+                "count": 1
+              }
+            ]
+          },
+          "size_mb": 5.626678466796875e-05
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,7 @@ from flask_cors import CORS
 import sys
 sys.path.append('../')
 from database import db_access
+import traceback
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {
@@ -162,55 +163,108 @@ class Login(Resource):
 
 @resources_ns.route("/", methods=['GET'])
 class Resources(Resource):
-    """Get available hardware ressources"""
+    """Get available hardware resources"""
     def get(self):
-        return db_access.getAvailHardwares(), 200
+        return db_access.getAllHardwareInfo(), 200
 
 @resources_ns.route("/checkout", methods=['POST'])
 class CheckOut(Resource):
-    @api.expect(checkout_model)
-    @api.response(202, "Successfully check out hardwares")
-    @api.response(401, "Unauthorized")
-    @api.response(503, "Service Unavailable")
     @jwt_required()
     def post(self):
-        """Check out hardware resources"""
-        data = request.json
-        projectID, hardware_set, amount = data["projectID"], data["hardware_set"], data["amount"]
-        # check for jwt token validity
-        email = get_jwt_identity()
-        # check if hardware available
-        if not db_access.checkHardwareAvail(hardware_set, amount):
-            return {"message": "Insufficient hardware resources"}, 503
-        
-        if db_access.checkoutHardwares(projectID, hardware_set, amount):
-            return {"message": f"Successfully check out {amount} from {hardware_set}"}, 202
-        else:
-            return {"message": "Check out failed"}, 503
+        try:
+            data = request.json
+            projectID, hardware_set, amount = data["projectID"], data["hardware_set"], data["amount"]
+            
+            print(f"Checkout request: Project {projectID}, Hardware {hardware_set}, Amount {amount}")
+            
+            # Input validation
+            if not isinstance(amount, int) or amount <= 0:
+                return {"message": "Amount must be a positive integer"}, 400
+                
+            # Check if hardware set exists
+            hw_set = db_access.hws_col.find_one({"name": hardware_set})
+            if not hw_set:
+                return {"message": f"Hardware set {hardware_set} not found"}, 404
+                
+            # Check if enough hardware is available
+            if hw_set["avail"] < amount:
+                return {"message": f"Not enough hardware available. Requested: {amount}, Available: {hw_set['avail']}"}, 400
+                
+            # Check project existence
+            project = db_access.proj_col.find_one({"_id": projectID})
+            if not project:
+                return {"message": f"Project {projectID} not found"}, 404
+            
+            # Attempt checkout
+            result = db_access.checkoutHardwares(projectID, hardware_set, amount)
+            
+            if result == 0:
+                return {"message": f"Successfully checked out {amount} units of {hardware_set}"}, 200
+            else:
+                print(f"Checkout failed with error code: {result}")
+                error_messages = {
+                    -1: "Amount must be greater than zero",
+                    -2: f"Project {projectID} not found",
+                    -3: f"Hardware set {hardware_set} not found",
+                    -4: f"Not enough hardware available",
+                    -5: "Failed to update hardware availability",
+                    -6: "Failed to update checkout record",
+                    -99: "An internal error occurred"
+                }
+                error_msg = error_messages.get(result, "An error occurred during checkout operation")
+                return {"message": error_msg}, 400
+                
+        except Exception as e:
+            print(f"Exception in checkout endpoint: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return {"message": f"Server error: {str(e)}"}, 500
 
 
 @resources_ns.route("/checkin", methods=['POST'])
 class CheckIn(Resource):
-    @api.expect(checkout_model)
-    @api.response(202, "Successfully check in hardwares")
-    @api.response(401, "Unauthorized")
-    @api.response(503, "Service Unavailable")
     @jwt_required()
     def post(self):
-        """Check in hardware resources"""
-        data = request.json
-        projectID, hardware_set, amount = data["projectID"], data["hardware_set"], data["amount"]
-        # check for jwt token validity
-        email = get_jwt_identity()
-
-        # check if hardware available
-        if not db_access.checkAssignedHardwares(projectID, hardware_set, amount):
-            return {"message": "No enough hardware to check in"}, 503
-
-        if db_access.checkInHardwares(projectID, hardware_set, amount):
-            return {"message": f"Successfully check in {amount} of {hardware_set}"}, 202
-        else:
-            return {"message": "Check in failed"}, 503
+        try:
+            data = request.json
+            projectID, hardware_set, amount = data["projectID"], data["hardware_set"], data["amount"]
+            
+            print(f"Check-in request: Project {projectID}, Hardware {hardware_set}, Amount {amount}")
+            
+            # Check if project has this hardware checked out
+            checkout = db_access.checkout_col.find_one({'project': projectID, 'hw_name': hardware_set})
+            if not checkout:
+                return {"message": f"Project {projectID} has not checked out any {hardware_set}"}, 400
+                
+            current_amount = checkout.get('amount', 0)
+            print(f"Project {projectID} has {current_amount} units of {hardware_set} checked out")
+            
+            if current_amount < amount:
+                return {"message": f"Cannot check in {amount} units. Project only has {current_amount} units checked out."}, 400
+            
+            # Attempt check-in
+            result = db_access.checkInHardwares(projectID, hardware_set, amount)
+            
+            if result == 0:
+                return {"message": f"Successfully checked in {amount} units of {hardware_set}"}, 200
+            else:
+                print(f"Check-in failed with error code: {result}")
+                error_messages = {
+                    -1: "Amount must be greater than zero",
+                    -2: f"Project {projectID} has not checked out any {hardware_set}",
+                    -3: f"Project only has {current_amount} units of {hardware_set} checked out",
+                    -4: "Failed to update checkout record",
+                    -5: "Failed to update hardware set",
+                    -99: "An internal error occurred"
+                }
+                error_msg = error_messages.get(result, "An error occurred during check-in operation")
+                return {"message": error_msg}, 400
+                
+        except Exception as e:
+            print(f"Exception in check-in endpoint: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return {"message": f"Server error: {str(e)}"}, 500
 
 @project_ns.route("/create", methods=['POST'])            
 class CreateProject(Resource):

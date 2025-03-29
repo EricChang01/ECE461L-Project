@@ -1,0 +1,180 @@
+/* Fix table alignment issues */
+.projects-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.projects-table th,
+.projects-table td {
+  border-bottom: 1px solid #eee;
+  padding: 16px;
+  text-align: left;
+  vertical-align: middle;
+  border-spacing: 0;
+}
+
+/* Ensure consistent cell borders */
+.projects-table th {
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+}
+
+/* Zebra striping for better readability */
+.projects-table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.projects-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Hardware management row styling */
+.hardware-management-row td {
+  padding: 0;
+}
+
+.hardware-management {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+/* Style for nested hardware table */
+.hardware-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.hardware-table th,
+.hardware-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.hardware-table th {
+  text-align: left;
+  background-color: #f2f2f2;
+}
+
+/* Add this to your existing CSS */
+.project-actions {
+  vertical-align: middle;
+}
+
+/* Add continuous border to rows for visual clarity */
+.projects-table tr {
+  border-bottom: 1px solid #eee;
+}
+
+/* Specifically address the possible gap issue */
+.project-hardware,
+.project-actions {
+  border-bottom: 1px solid #eee;
+}
+
+.hardware-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hardware-item {
+  line-height: 1.4;
+}
+
+/* Ensure the hardware list doesn't break the layout */
+.hardware-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* Make sure all cells in a row have the same effective border */
+.projects-table tr {
+  position: relative;
+}
+
+.projects-table tr::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #eee;
+  z-index: 1;
+}
+
+/* Add a new approach for borders */
+.project-data-row {
+  position: relative;
+  border-bottom: none !important;
+}
+
+.project-data-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: #eee;
+  pointer-events: none;
+}
+
+/* Ensure the hardware items display properly */
+.hardware-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container for action buttons */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+/* Hide the individual cell borders to prevent the discontinuity */
+.project-data-row td {
+  border-bottom: none;
+}
+
+/* Override the zebra striping to ensure it covers the entire row */
+.projects-table tbody .project-data-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.projects-table tbody .project-data-row:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.project-row-wrapper {
+  border-bottom: 1px solid #eee;
+}
+
+.project-row-wrapper td {
+  border-bottom: none; /* Remove individual cell borders */
+}
+
+/* Add more spacing between action buttons */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+/* If you're not using the action-buttons class, add this instead: */
+.manage-hardware-button {
+  margin-right: 20px;
+}
+
+/* Make the buttons a bit wider for better appearance */
+.manage-hardware-button,
+.leave-button {
+  min-width: 140px;
+  text-align: center;
+  padding: 8px 16px;
+}

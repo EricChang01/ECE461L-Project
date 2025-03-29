@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CreateProjectModal from "./CreateProjectModal";
 import JoinProjectModal from "./JoinProjectModal";
 import ConfirmationModal from "./ConfirmationModal";
+import HardwareDialog from "./HardwareDialog";
 import "./styles.css";
 
 const Projects = () => {
@@ -27,6 +28,16 @@ const Projects = () => {
     message: "",
     type: "success",
   });
+  const [hardwareSets, setHardwareSets] = useState([]);
+  const [expandedProject, setExpandedProject] = useState(null);
+  const [hardwareDialog, setHardwareDialog] = useState({
+    isOpen: false,
+    operation: "",
+    projectID: "",
+    hardware: null,
+  });
+  const [amount, setAmount] = useState(1);
+  const [operationResult, setOperationResult] = useState(null);
 
   const navigate = useNavigate();
 
@@ -74,6 +85,31 @@ const Projects = () => {
 
     fetchProjects();
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchHardwareSets = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://127.0.0.1:5000/resources/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setHardwareSets(data);
+        } else {
+          console.error("Failed to fetch hardware sets");
+        }
+      } catch (error) {
+        console.error("Error fetching hardware sets:", error);
+      }
+    };
+
+    fetchHardwareSets();
+  }, []);
 
   const handleProjectCreated = (newProject) => {
     setProjects([...projects, newProject]);
@@ -218,6 +254,109 @@ const Projects = () => {
     setResultModal({ ...resultModal, isOpen: false });
   };
 
+  const handleExpandProject = (projectID) => {
+    setExpandedProject(expandedProject === projectID ? null : projectID);
+  };
+
+  // Function to get amount of a specific hardware checked out by a project
+  const getCheckedOutAmount = (projectID, hwName) => {
+    const project = projects.find((p) => p.projectID === projectID);
+    if (!project || !project.hardware) return 0;
+
+    const hw = project.hardware.find((h) => h.hw_name === hwName);
+    return hw ? hw.amount : 0;
+  };
+
+  // Handle hardware operations (checkout/checkin)
+  const handleHardwareOperation = (operation, projectID, hardware) => {
+    // Validate before opening dialog
+    if (operation === "checkout" && hardware.avail <= 0) {
+      alert(`No ${hardware.name} units available for checkout`);
+      return;
+    }
+
+    setHardwareDialog({
+      isOpen: true,
+      operation,
+      projectID,
+      hardware,
+    });
+  };
+
+  // Handle completion of operations
+  const handleOperationComplete = () => {
+    // Refresh projects and hardware data
+    refreshProjects();
+    refreshHardwareSets();
+  };
+
+  // Close hardware dialog
+  const closeHardwareDialog = () => {
+    setHardwareDialog({
+      ...hardwareDialog,
+      isOpen: false,
+    });
+  };
+
+  const refreshProjects = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/my-login");
+        return;
+      }
+
+      const response = await fetch(
+        "http://127.0.0.1:5000/projects/user_projects",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/my-login");
+        return;
+      }
+
+      const data = await response.json();
+      setProjects(data.projects || []);
+    } catch (error) {
+      console.error("Error refreshing projects:", error);
+    }
+  };
+
+  const refreshHardwareSets = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://127.0.0.1:5000/resources/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHardwareSets(data);
+      } else {
+        console.error("Failed to fetch hardware sets");
+      }
+    } catch (error) {
+      console.error("Error refreshing hardware sets:", error);
+    }
+  };
+
+  // Add a helper function to get the amount of hardware a project has
+  const getProjectHardwareAmount = (project, hardwareName) => {
+    if (!project.hardware) return 0;
+    const hw = project.hardware.find((h) => h.hw_name === hardwareName);
+    return hw ? hw.amount : 0;
+  };
+
   return (
     <div className="projects-container">
       {/* Add logout button */}
@@ -259,50 +398,135 @@ const Projects = () => {
             <thead>
               <tr>
                 <th>Project name</th>
-                <th className="center-align">Project ID</th>
+                <th>Project ID</th>
                 <th>Users</th>
                 <th>Description</th>
-                <th>Hardware</th>
+                <th>Hardware (Usage/Capacity)</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {projects.map((project) => (
-                <tr key={project.projectID} className="project-row">
-                  <td className="project-name">{project.name}</td>
-                  <td className="project-id center-align">
-                    {project.projectID}
-                  </td>
-                  <td className="project-users">
-                    {project.users
-                      .map((user) => user.username || user.email)
-                      .join(", ")}
-                  </td>
-                  <td className="project-description">{project.des}</td>
-                  <td className="project-hardware">
-                    {project.hardware && project.hardware.length > 0 ? (
-                      <ul className="hardware-list">
-                        {project.hardware.map((hw, idx) => (
-                          <li key={idx}>
-                            {hw.hw_name}: {hw.amount}/100
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span>No hardware assigned</span>
-                    )}
-                  </td>
-                  <td className="project-actions">
-                    <button
-                      className="leave-button"
-                      onClick={() =>
-                        handleLeaveProject(project.projectID, project.name)
-                      }
-                    >
-                      Leave
-                    </button>
-                  </td>
-                </tr>
+                <React.Fragment key={project.projectID}>
+                  <tr className="project-data-row">
+                    <td className="project-name">{project.name}</td>
+                    <td className="project-id">{project.projectID}</td>
+                    <td className="project-users">
+                      {project.users
+                        .map((user) => user.username || user.email)
+                        .join(", ")}
+                    </td>
+                    <td className="project-description">{project.des}</td>
+                    <td className="project-hardware">
+                      {project.hardware && project.hardware.length > 0 ? (
+                        <div className="hardware-items">
+                          {project.hardware.map((hw, idx) => (
+                            <div key={idx} className="hardware-item">
+                              {hw.hw_name}: {hw.amount}/100
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span>No hardware assigned</span>
+                      )}
+                    </td>
+                    <td className="project-actions">
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
+                        <button
+                          className="manage-hardware-button"
+                          onClick={() => handleExpandProject(project.projectID)}
+                          style={{
+                            marginRight: "15px",
+                            minWidth: "150px",
+                            padding: "8px 12px",
+                          }}
+                        >
+                          {expandedProject === project.projectID
+                            ? "Hide Hardware"
+                            : "Manage Hardware"}
+                        </button>
+                        <button
+                          className="leave-button"
+                          onClick={() =>
+                            handleLeaveProject(project.projectID, project.name)
+                          }
+                          style={{ minWidth: "80px", padding: "8px 12px" }}
+                        >
+                          Leave
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {/* Hardware management row */}
+                  {expandedProject === project.projectID && (
+                    <tr className="hardware-management-row">
+                      <td colSpan="6">
+                        <div className="hardware-management">
+                          <h4>Hardware Management</h4>
+                          <table className="hardware-table">
+                            <thead>
+                              <tr>
+                                <th>Hardware Set</th>
+                                <th>Availability/Capacity</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {hardwareSets.map((hardware) => (
+                                <tr key={hardware.name}>
+                                  <td>{hardware.name}</td>
+                                  <td>
+                                    {hardware.avail}/{hardware.capacity}
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="checkout-button"
+                                      onClick={() =>
+                                        handleHardwareOperation(
+                                          "checkout",
+                                          project.projectID,
+                                          hardware
+                                        )
+                                      }
+                                      disabled={hardware.avail <= 0}
+                                    >
+                                      Check Out
+                                    </button>
+                                    <button
+                                      className="checkin-button"
+                                      onClick={() =>
+                                        handleHardwareOperation(
+                                          "checkin",
+                                          project.projectID,
+                                          hardware
+                                        )
+                                      }
+                                      disabled={
+                                        !getProjectHardwareAmount(
+                                          project,
+                                          hardware.name
+                                        )
+                                      }
+                                    >
+                                      Check In
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -343,6 +567,15 @@ const Projects = () => {
         onConfirm={closeResultModal}
         onCancel={closeResultModal}
         type={resultModal.type}
+      />
+
+      <HardwareDialog
+        isOpen={hardwareDialog.isOpen}
+        onClose={closeHardwareDialog}
+        operation={hardwareDialog.operation}
+        projectID={hardwareDialog.projectID}
+        hardware={hardwareDialog.hardware}
+        onOperationComplete={handleOperationComplete}
       />
     </div>
   );

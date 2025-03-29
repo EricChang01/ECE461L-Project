@@ -57,25 +57,80 @@ def checkHardwareAvail(hardware_set, amount):
     return result > 0
 
 def checkoutHardwares(projectID, hardware_set, amount):
-    # if not checkHardwareAvail(hardware_set, amount):
-    #     return False
+    """Check out hardware resources for a project"""
+    try:
+        print(f"CheckoutHardwares called: Project {projectID}, Hardware {hardware_set}, Amount {amount}")
+        
+        # Input validation
+        if amount <= 0:
+            print(f"Invalid amount: {amount}")
+            return -1
+        
+        # Convert projectID to the right type if needed (int or string)
+        # This handles the case where projectID might be passed as a string but stored as int
+        try:
+            numeric_project_id = int(projectID)
+            # Check if project exists with numeric ID
+            project = proj_col.find_one({"_id": numeric_project_id})
+            if project:
+                projectID = numeric_project_id
+        except ValueError:
+            # If conversion fails, use as is (it's already a string)
+            pass
+            
+        # Check if project exists
+        project = proj_col.find_one({"_id": projectID})
+        if not project:
+            print(f"Project {projectID} not found")
+            return -2
+            
+        # Check if hardware set exists
+        hw_set = hws_col.find_one({"name": hardware_set})
+        if not hw_set:
+            print(f"Hardware set {hardware_set} not found")
+            return -3
+            
+        # Check availability
+        if hw_set["avail"] < amount:
+            print(f"Not enough hardware available. Requested: {amount}, Available: {hw_set['avail']}")
+            return -4
 
-    result = hws_col.update_one(
-        {'name': hardware_set, 'avail': {'$gte': amount}}, 
-        {'$inc': {'avail': -amount}}
-    )
-    if result.modified_count != 1:
-        return -1
+        # Update hardware availability
+        result = hws_col.update_one(
+            {'name': hardware_set, 'avail': {'$gte': amount}}, 
+            {'$inc': {'avail': -amount}}
+        )
+        print(f"Update hardware result: {result.modified_count}")
+        
+        if result.modified_count != 1:
+            print(f"Failed to update hardware set")
+            return -5
 
-    result = checkout_col.update_one(
-        {'project': projectID, 'hw_name':hardware_set}, 
-        {'$inc':{'amount': amount}},
-        upsert=True
-    )
-    # if checkout_col.count_documents({'email':email, 'hw_name':hardware_set}) > 0:
-    # else:
-    #     checkout_col.insert_one({'email':email, 'hw_name':hardware_set, 'amount':amount})
-    return 0
+        # Update project's checked out hardware
+        result = checkout_col.update_one(
+            {'project': projectID, 'hw_name': hardware_set}, 
+            {'$inc': {'amount': amount}},
+            upsert=True
+        )
+        print(f"Update checkout result: {result.modified_count}, upserted_id: {result.upserted_id}")
+        
+        if result.modified_count != 1 and result.upserted_id is None:
+            print(f"Failed to update checkout record")
+            # Try to revert hardware availability change
+            hws_col.update_one(
+                {'name': hardware_set},
+                {'$inc': {'avail': amount}}
+            )
+            return -6
+        
+        print(f"Successfully checked out {amount} units of {hardware_set} for project {projectID}")
+        return 0
+        
+    except Exception as e:
+        print(f"Error in checkoutHardwares: {e}")
+        import traceback
+        traceback.print_exc()
+        return -99
 
 def checkAssignedHardwares(projectID, hardware_set, amount):
     result = checkout_col.count_documents(
@@ -83,22 +138,79 @@ def checkAssignedHardwares(projectID, hardware_set, amount):
     return result > 0  
 
 def checkInHardwares(projectID, hardware_set, amount):
-    # if not checkAssignedHardwares(email, hardware_set, amount):
-    #     return False
+    """Check in hardware resources for a project"""
+    try:
+        print(f"CheckInHardwares called: Project {projectID}, Hardware {hardware_set}, Amount {amount}")
+        
+        # Input validation
+        if amount <= 0:
+            print(f"Invalid amount: {amount}")
+            return -1
+        
+        # Convert projectID to the right type if needed (int or string)
+        # This handles the case where projectID might be passed as a string but stored as int
+        try:
+            numeric_project_id = int(projectID)
+            # Check first with the numeric version
+            checkout = checkout_col.find_one({'project': numeric_project_id, 'hw_name': hardware_set})
+            if checkout:
+                projectID = numeric_project_id
+        except ValueError:
+            # If conversion fails, use as is (it's already a string)
+            pass
+            
+        print(f"Looking for project: {projectID}, type: {type(projectID)}")
+        
+        # Check if the project has actually checked out this hardware
+        checkout_record = checkout_col.find_one({'project': projectID, 'hw_name': hardware_set})
+        if not checkout_record:
+            print(f"Project {projectID} has not checked out any {hardware_set}")
+            return -2
+            
+        # Check if project has enough hardware to check in
+        if checkout_record["amount"] < amount:
+            print(f"Project {projectID} only has {checkout_record['amount']} units of {hardware_set}, cannot check in {amount}")
+            return -3
 
-    result = checkout_col.update_one(
-        {'project':projectID, 'hw_name':hardware_set, 'amount': {'$gte': amount}}, 
-        {'$inc': {'amount': -amount}}
-    )
-    if result.modified_count != 1:
-        return -1
+        # Update checked out hardware
+        result = checkout_col.update_one(
+            {'project': projectID, 'hw_name': hardware_set, 'amount': {'$gte': amount}}, 
+            {'$inc': {'amount': -amount}}
+        )
+        print(f"Update checkout result: {result.modified_count}")
+        
+        if result.modified_count != 1:
+            print(f"Failed to update checkout record")
+            return -4
 
-    result = hws_col.update_one({'name': hardware_set}, {'$inc': {'avail': amount}})
-    if result.modified_count != 1:
-        return -1
+        # Update hardware availability
+        result = hws_col.update_one(
+            {'name': hardware_set}, 
+            {'$inc': {'avail': amount}}
+        )
+        print(f"Update hardware result: {result.modified_count}")
+        
+        if result.modified_count != 1:
+            print(f"Failed to update hardware set")
+            # Unfortunately, we already updated the checkout record, and lack of transaction
+            # means we have inconsistent state. Try to revert:
+            checkout_col.update_one(
+                {'project': projectID, 'hw_name': hardware_set},
+                {'$inc': {'amount': amount}}
+            )
+            return -5
 
-    checkout_col.delete_one({'amount': {'$lte': 0}})
-    return 0
+        # Clean up zero-amount checkouts
+        checkout_col.delete_many({'amount': {'$lte': 0}})
+        
+        print(f"Successfully checked in {amount} units of {hardware_set} for project {projectID}")
+        return 0
+        
+    except Exception as e:
+        print(f"Error in checkInHardwares: {e}")
+        import traceback
+        traceback.print_exc()
+        return -99
 
 def createProject(name, des, projectID, creator_email):
     if proj_col.find_one({"_id": projectID}):
@@ -443,6 +555,11 @@ def releaseAllProjectHardware(projectID):
 def getCheckedOutHW(projectID):
     all_hw = checkout_col.find({"project": projectID}, {"_id":0, "project":0})
     return [hw for hw in all_hw]
+
+def getAllHardwareInfo():
+    """Get complete hardware information including availability and capacity"""
+    all_hw = list(hws_col.find({}, {"name": 1, "avail": 1, "capacity": 1, "_id": 0}))
+    return all_hw
 
 db_init()
 
