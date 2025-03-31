@@ -420,11 +420,13 @@ const Projects = () => {
                     <td className="project-hardware">
                       {project.hardware && project.hardware.length > 0 ? (
                         <div className="hardware-items">
-                          {project.hardware.map((hw, idx) => (
-                            <div key={idx} className="hardware-item">
-                              {hw.hw_name}: {hw.amount}/100
-                            </div>
-                          ))}
+                          {[...project.hardware]
+                            .sort((a, b) => a.hw_name.localeCompare(b.hw_name))
+                            .map((hw, idx) => (
+                              <div key={idx} className="hardware-item">
+                                {hw.hw_name}: {hw.amount}/100
+                              </div>
+                            ))}
                         </div>
                       ) : (
                         <span>No hardware assigned</span>
