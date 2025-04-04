@@ -124,6 +124,15 @@ const Projects = () => {
   };
 
   const performOperation = async () => {
+    // Don't proceed if amount is empty or 0
+    if (amount === "" || amount <= 0) {
+      setOperationResult({
+        success: false,
+        message: "Amount must be greater than zero",
+      });
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const { projectID, type, hardware } = currentOperation;
