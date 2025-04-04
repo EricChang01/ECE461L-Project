@@ -87,6 +87,14 @@ const Projects = () => {
     setExpandedProject(expandedProject === projectID ? null : projectID);
   };
 
+  const getCheckedOutAmount = (projectID, hwName) => {
+    const project = projects.find((p) => p.projectID === projectID);
+    if (!project || !project.hardware) return 0;
+
+    const hw = project.hardware.find((h) => h.hw_name === hwName);
+    return hw ? hw.amount : 0;
+  };
+
   const handleOpenDialog = (projectID, type, hardware) => {
     setCurrentOperation({
       projectID,
@@ -103,9 +111,15 @@ const Projects = () => {
   };
 
   const handleAmountChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (value > 0) {
-      setAmount(value);
+    const value = e.target.value;
+    // Allow empty string or convert to number
+    if (value === "") {
+      setAmount("");
+    } else {
+      const numValue = parseInt(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        setAmount(numValue);
+      }
     }
   };
 
@@ -308,10 +322,20 @@ const Projects = () => {
               <Typography variant="body1" gutterBottom>
                 {currentOperation.hardware?.name}
               </Typography>
-              <Typography variant="body2" gutterBottom>
-                Available: {currentOperation.hardware?.avail} /{" "}
-                {currentOperation.hardware?.capacity}
-              </Typography>
+              {currentOperation.type === "checkout" ? (
+                <Typography variant="body2" gutterBottom>
+                  Available: {currentOperation.hardware?.avail} /{" "}
+                  {currentOperation.hardware?.capacity}
+                </Typography>
+              ) : (
+                <Typography variant="body2" gutterBottom>
+                  Currently checked out:{" "}
+                  {getCheckedOutAmount(
+                    currentOperation.projectID,
+                    currentOperation.hardware?.name
+                  )}
+                </Typography>
+              )}
               <TextField
                 label="Amount"
                 type="number"
@@ -324,7 +348,10 @@ const Projects = () => {
                   max:
                     currentOperation.type === "checkout"
                       ? currentOperation.hardware?.avail
-                      : undefined,
+                      : getCheckedOutAmount(
+                          currentOperation.projectID,
+                          currentOperation.hardware?.name
+                        ),
                 }}
               />
             </>
@@ -335,7 +362,11 @@ const Projects = () => {
             {operationResult ? "Close" : "Cancel"}
           </Button>
           {!operationResult && (
-            <Button onClick={performOperation} color="primary">
+            <Button
+              onClick={performOperation}
+              color="primary"
+              disabled={amount === "" || amount <= 0}
+            >
               Confirm
             </Button>
           )}

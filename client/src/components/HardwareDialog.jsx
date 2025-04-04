@@ -22,11 +22,20 @@ const HardwareDialog = ({
   }, [isOpen]);
 
   const handleAmountChange = (e) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value > 0) {
-      // Don't allow more than available
-      const max = operation === "checkout" ? hardware?.avail || 0 : Infinity;
-      setAmount(value > max ? max : value);
+    const value = e.target.value;
+    // Allow empty string or convert to number
+    if (value === "") {
+      setAmount("");
+    } else {
+      const numValue = parseInt(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        // Don't allow more than available
+        const max =
+          operation === "checkout"
+            ? hardware?.avail || 0
+            : checkedOutAmount || 0;
+        setAmount(numValue > max ? max : numValue);
+      }
     }
   };
 
@@ -176,6 +185,7 @@ const HardwareDialog = ({
               onClick={performOperation}
               disabled={
                 isLoading ||
+                amount === "" ||
                 amount <= 0 ||
                 (operation === "checkout" && amount > hardware?.avail)
               }

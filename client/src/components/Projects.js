@@ -38,6 +38,7 @@ const Projects = () => {
   });
   const [amount, setAmount] = useState(1);
   const [operationResult, setOperationResult] = useState(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
 
   const navigate = useNavigate();
 
@@ -357,6 +358,20 @@ const Projects = () => {
     return hw ? hw.amount : 0;
   };
 
+  // Toggle description expansion
+  const toggleDescription = (projectID) => {
+    setExpandedDescriptions({
+      ...expandedDescriptions,
+      [projectID]: !expandedDescriptions[projectID],
+    });
+  };
+
+  // Helper function to truncate text
+  const truncateText = (text, maxLength = 100) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  };
+
   return (
     <div className="projects-container">
       {/* Add logout button */}
@@ -416,7 +431,25 @@ const Projects = () => {
                         .map((user) => user.username || user.email)
                         .join(", ")}
                     </td>
-                    <td className="project-description">{project.des}</td>
+                    <td className="project-description">
+                      {project.des && project.des.length > 100 ? (
+                        <>
+                          {expandedDescriptions[project.projectID]
+                            ? project.des
+                            : truncateText(project.des)}
+                          <button
+                            className="read-more-button"
+                            onClick={() => toggleDescription(project.projectID)}
+                          >
+                            {expandedDescriptions[project.projectID]
+                              ? "Read less"
+                              : "Read more"}
+                          </button>
+                        </>
+                      ) : (
+                        project.des
+                      )}
+                    </td>
                     <td className="project-hardware">
                       {project.hardware && project.hardware.length > 0 ? (
                         <div className="hardware-items">
@@ -577,6 +610,14 @@ const Projects = () => {
         operation={hardwareDialog.operation}
         projectID={hardwareDialog.projectID}
         hardware={hardwareDialog.hardware}
+        checkedOutAmount={
+          hardwareDialog.hardware
+            ? getCheckedOutAmount(
+                hardwareDialog.projectID,
+                hardwareDialog.hardware.name
+              )
+            : 0
+        }
         onOperationComplete={handleOperationComplete}
       />
     </div>

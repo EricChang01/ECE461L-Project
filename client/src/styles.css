@@ -8,9 +8,9 @@
 .projects-table th,
 .projects-table td {
   border-bottom: 1px solid #eee;
-  padding: 16px;
+  padding: 12px 8px;
   text-align: left;
-  vertical-align: middle;
+  vertical-align: top;
   border-spacing: 0;
 }
 
@@ -66,6 +66,7 @@
 /* Add continuous border to rows for visual clarity */
 .projects-table tr {
   border-bottom: 1px solid #eee;
+  min-height: 60px;
 }
 
 /* Specifically address the possible gap issue */
@@ -177,4 +178,68 @@
   min-width: 140px;
   text-align: center;
   padding: 8px 16px;
+}
+
+.project-description {
+  max-width: 300px; /* Limit width */
+  position: relative; /* For positioning the read more button */
+  line-height: 1.4;
+  word-break: break-word; /* Prevent overflow of long words */
+}
+
+.truncated-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.read-more-button {
+  color: #4a90e2;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  text-decoration: underline;
+  margin-top: 4px;
+  display: block; /* Make it a block to appear on its own line */
+}
+
+.read-more-button:hover {
+  color: #1a5faa;
+}
+
+.projects-table td {
+  vertical-align: top;
+  padding: 16px 12px;
+  line-height: 1.5;
+}
+
+/* For the header row */
+.projects-table th {
+  padding: 16px 12px;
+  vertical-align: middle;
+}
+
+/* Increase height for all data rows in the table */
+.projects-table tbody tr {
+  height: 80px; /* Set a fixed height for all data rows */
+  min-height: 80px; /* Ensure minimum height is also set */
+}
+
+/* Adjust vertical alignment and padding for all cells */
+.projects-table tbody td {
+  vertical-align: middle; /* Center content vertically */
+  padding: 16px 12px; /* Add generous padding */
+}
+
+/* Ensure hardware items display properly */
+.project-hardware {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 }
