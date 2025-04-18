@@ -1,0 +1,86 @@
+The design of MongoDB database and access functions:
+
+Collections:
+Users
+{
+    "_id":      ObjID,
+    "username": String,
+    "email":    String,
+    "pwd":      String  //stored as a hash
+}
+
+Projects
+{
+    "_id":      Int,    //custom number from project creator.
+    "name":     String,
+    "des":      String,
+    "users":    [String] //List of emails
+}
+
+HwSets
+{
+    "_id":      ObjID,
+    "name":     String,
+    "capacity": Int,
+    "avail":    Int
+}
+
+HwInUse
+{
+    "_id":      ObjID,
+    "project":  Int,
+    "hw_name":  String,
+    "amount":   Int
+}
+
+
+Functions:
+db_init()
+    initialize the mongodb connection and create global variables for each collection.
+
+checkEmailExist(email)
+    return true iff the email exists in the user database
+
+addUser(username, email, hashed_password)
+    create a new user and add them to the database
+    return 0 on success, -1 if username or email already exists
+
+getUserHashedPassword(email)
+    return pwd associated with the email.
+    returns None if email not found.
+
+getAvailHardwares()
+    returns a dictionary of all hw sets and their availabilty
+
+checkHardwareAvail(hardware_set, amount)
+    returns true if the amount specified can be checked out from the hw set specified.
+
+checkoutHardwares(projectID, hardware_set, amount)
+    checks out requested hw and updates the database
+    returns 0 on success, -1 on failure 
+
+checkAssignedHardwares(projectID, hardware_set, amount)
+    returns true if the amount specifed can be checked in to the hw set specified by that project
+
+checkInHardwares(projectID, hardware_set, amount)
+    checks in requested hw and updates the database
+    returns 0 on success, -1 on failure 
+
+createProject(name, des, projectID)
+    creates a new project and adds it to the database
+    return 0 on success, -1 on non-unique id, -2 on other error
+
+getProject(email, projectID):
+    adds user to project if not present already.
+    return dictionary of the project details (see below), None on error
+    {
+        name: String
+        des: String
+        users: [String]
+        hwInUse: [
+            {
+                hw: String
+                amount: Int
+            }
+            ]
+    }

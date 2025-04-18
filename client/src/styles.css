@@ -1,0 +1,245 @@
+/* Fix table alignment issues */
+.projects-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.projects-table th,
+.projects-table td {
+  border-bottom: 1px solid #eee;
+  padding: 12px 8px;
+  text-align: left;
+  vertical-align: top;
+  border-spacing: 0;
+}
+
+/* Ensure consistent cell borders */
+.projects-table th {
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+}
+
+/* Zebra striping for better readability */
+.projects-table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.projects-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Hardware management row styling */
+.hardware-management-row td {
+  padding: 0;
+}
+
+.hardware-management {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+/* Style for nested hardware table */
+.hardware-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.hardware-table th,
+.hardware-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.hardware-table th {
+  text-align: left;
+  background-color: #f2f2f2;
+}
+
+/* Add this to your existing CSS */
+.project-actions {
+  vertical-align: middle;
+}
+
+/* Add continuous border to rows for visual clarity */
+.projects-table tr {
+  border-bottom: 1px solid #eee;
+  min-height: 60px;
+}
+
+/* Specifically address the possible gap issue */
+.project-hardware,
+.project-actions {
+  border-bottom: 1px solid #eee;
+}
+
+.hardware-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hardware-item {
+  line-height: 1.4;
+}
+
+/* Ensure the hardware list doesn't break the layout */
+.hardware-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* Make sure all cells in a row have the same effective border */
+.projects-table tr {
+  position: relative;
+}
+
+.projects-table tr::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #eee;
+  z-index: 1;
+}
+
+/* Add a new approach for borders */
+.project-data-row {
+  position: relative;
+  border-bottom: none !important;
+}
+
+.project-data-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: #eee;
+  pointer-events: none;
+}
+
+/* Ensure the hardware items display properly */
+.hardware-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container for action buttons */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+/* Hide the individual cell borders to prevent the discontinuity */
+.project-data-row td {
+  border-bottom: none;
+}
+
+/* Override the zebra striping to ensure it covers the entire row */
+.projects-table tbody .project-data-row:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.projects-table tbody .project-data-row:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.project-row-wrapper {
+  border-bottom: 1px solid #eee;
+}
+
+.project-row-wrapper td {
+  border-bottom: none; /* Remove individual cell borders */
+}
+
+/* Add more spacing between action buttons */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+/* If you're not using the action-buttons class, add this instead: */
+.manage-hardware-button {
+  margin-right: 20px;
+}
+
+/* Make the buttons a bit wider for better appearance */
+.manage-hardware-button,
+.leave-button {
+  min-width: 140px;
+  text-align: center;
+  padding: 8px 16px;
+}
+
+.project-description {
+  max-width: 300px; /* Limit width */
+  position: relative; /* For positioning the read more button */
+  line-height: 1.4;
+  word-break: break-word; /* Prevent overflow of long words */
+}
+
+.truncated-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.read-more-button {
+  color: #4a90e2;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  text-decoration: underline;
+  margin-top: 4px;
+  display: block; /* Make it a block to appear on its own line */
+}
+
+.read-more-button:hover {
+  color: #1a5faa;
+}
+
+.projects-table td {
+  vertical-align: top;
+  padding: 16px 12px;
+  line-height: 1.5;
+}
+
+/* For the header row */
+.projects-table th {
+  padding: 16px 12px;
+  vertical-align: middle;
+}
+
+/* Increase height for all data rows in the table */
+.projects-table tbody tr {
+  height: 80px; /* Set a fixed height for all data rows */
+  min-height: 80px; /* Ensure minimum height is also set */
+}
+
+/* Adjust vertical alignment and padding for all cells */
+.projects-table tbody td {
+  vertical-align: middle; /* Center content vertically */
+  padding: 16px 12px; /* Add generous padding */
+}
+
+/* Ensure hardware items display properly */
+.project-hardware {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
